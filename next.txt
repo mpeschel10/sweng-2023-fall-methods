@@ -1,0 +1,20 @@
+Next:
+test data
+    HTTP response codes
+    atm, image is just "imagine a car crashing" for e.g. 500 internal server error
+
+client:
+    index.html
+    index.js
+    index.css
+    template table
+    browse list
+    sort list
+    search by keyword or ID
+    add new item (ID auto generated)
+    edit any attribute besides ID
+    delete item
+live update
+add images proper
+
+
