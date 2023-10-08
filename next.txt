@@ -1,8 +1,5 @@
 Next:
-test data
-    HTTP response codes
-    atm, image is just "imagine a car crashing" for e.g. 500 internal server error
-
+rust server or someth
 client:
     index.html
     index.js

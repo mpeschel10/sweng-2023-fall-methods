@@ -8,8 +8,18 @@ CREATE TABLE methods (
     CONSTRAINT PRIMARY KEY (id)
 );
 
--- INSERT INTO methods
---     (name, description, image)
--- VALUES
---     ("200", ),
---     ();
+INSERT INTO methods
+    (name, description, image)
+VALUES
+    (200, "Ok", "thumbs up emoji"),
+    (204, "No Content", "empty nest"),
+    (301, "Moved Permanently", "abandoned house or boarded up storefront"),
+    (302, "Moved Temporarily", "out to lunch sign or one of those clocks with, like, a back-at-eight thingy"),
+    (403, "Forbidden", "Person crossing arms emoji"),
+    (404, "Not found", "Person scratching head, question marks"),
+    (405, "Method Not Allowed", "That meme where the lady is putting bridge shape in square hole"),
+    (413, "Payload Too Large", "Someone pushing something too large into osmething too small"),
+    (418, "I'm a teapot", "Teapot"),
+    (500, "Internal Server Error", "Server with smoke coming out of it. Or car crash"),
+    (504, "Method Not Known", "Dog meme or something. AnimalsBeingDerps subreddit probably")
+;
