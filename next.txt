@@ -1,5 +1,6 @@
 Next:
-rust server or someth
+implement horrible rust sever lol
+
 client:
     index.html
     index.js
