@@ -13,9 +13,17 @@
         tbodyMethods.appendChild(rowMethod);
     }
 
+    async function refresh()
+    {
+        const response = await fetch("/api/rows");
+        const result = await response.text();
+        console.log(result);
+    }
+
     function init() {
         console.log("Henlo!");
         showMethod({id: 12, name: 413, description: "Payload too large", image: "Cathy shoving things in closet"});
+        refresh();
     }
 
     window.addEventListener("load", init);
