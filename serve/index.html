@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="index.js" async defer></script>
+    <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 <body>
     <h1>Hello!</h1>
     <p>Wass poppin' homeslice</p>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Description</th><th>Image</th></tr>
+        </thead>
+        <tbody id="tbody-methods">
+            
+        </tbody>
+    </table>
 </body>
+<template id="template-method-row">
+    <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td></tr>
+</template>
 </html>

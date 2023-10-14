@@ -1,9 +1,5 @@
 Next:
 client:
-    index.html
-    index.js
-    index.css
-    template table
     browse list
     sort list
     search by keyword or ID
