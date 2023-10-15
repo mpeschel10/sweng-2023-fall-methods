@@ -21,5 +21,5 @@ VALUES
     (413, "Payload Too Large", "Someone pushing something too large into osmething too small"),
     (418, "I'm a teapot", "Teapot"),
     (500, "Internal Server Error", "Server with smoke coming out of it. Or car crash"),
-    (504, "Method Not Known", "Dog meme or something. AnimalsBeingDerps subreddit probably")
+    (501, "Method Not Known", "Dog meme or something. AnimalsBeingDerps subreddit probably")
 ;
