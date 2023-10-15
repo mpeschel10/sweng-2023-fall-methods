@@ -1,4 +1,6 @@
 Project 2.pdf
+favicon/*.png
+favicon/*.ico
 
 # Added by cargo
 /target
