@@ -63,7 +63,7 @@ fn get_params(request : &Request<Body>) -> HashMap<String, Vec<String>> {
         if !params.contains_key(&key) {
             params.insert(key, Vec::new());
         }
-        let values : &mut Vec<String> = params.get_mut(&my_key).unwrap();
+        let values : &mut Vec<String> = params.get_mut(&my_key).expect("Inserted vector into dictionary and that vector was immediately unreachable. Are we multithreaded now???");
         values.push(value);
     }
     println!("Parsed request params: {params:#?}");
@@ -82,7 +82,7 @@ fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
         order: Order::Asc,
     };
 
-    if let Some(v) = params.get("order-by") {
+    if let Some(v) = params.get("order_by") {
         if let Some(v) = v.get(0) {
             match v.as_str() {
                 "id" => { normal_params.order_by = MethodsColumns::Id; },
@@ -104,6 +104,8 @@ fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
             }
         }
     }
+
+    println!("Normalized params to {normal_params:#?}");
 
     return normal_params;
 }
