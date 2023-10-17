@@ -15,7 +15,7 @@
 
     async function refresh()
     {
-        const response = await fetch("/api/rows");
+        const response = await fetch("/api/rows?order-by=description&desc=on");
         const rows = await response.json();
         for (const row of rows) {
             showMethod(row);

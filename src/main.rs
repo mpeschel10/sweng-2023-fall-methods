@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::convert::Infallible;
 use std::net::SocketAddr;
 
@@ -9,6 +10,10 @@ use mysql::prelude::Queryable;
 
 use json::JsonValue;
 
+use sea_query::{Query, Iden,};
+use sea_query::*;
+use sea_query::types::Order;
+
 #[derive(Debug, PartialEq, Eq)]
 struct MethodEntry {
     id: i32,
@@ -17,6 +22,26 @@ struct MethodEntry {
     image: Option<String>,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum MethodsColumns {
+    Table,
+    Id,
+    Name,
+    Description,
+    Image,
+}
+
+impl Iden for MethodsColumns {
+    fn unquoted(&self, s: &mut dyn std::fmt::Write) {
+        write!(s, "{}", match self {
+            Self::Table => "methods",
+            Self::Id => "id",
+            Self::Name => "name",
+            Self::Description => "description",
+            Self::Image => "image",
+        }).unwrap();
+    }
+}
 impl From<MethodEntry> for JsonValue {
     fn from(method_entry : MethodEntry) -> JsonValue {
         let mut object = JsonValue::new_object();
@@ -28,7 +53,62 @@ impl From<MethodEntry> for JsonValue {
     }
 }
 
-fn handle_rows(_req : &Request<Body>) -> Result<Response<Body>, Infallible> {
+fn get_params(request : &Request<Body>) -> HashMap<String, Vec<String>> {
+    let query_string = request.uri().query().unwrap_or("");
+    let query_pairs = form_urlencoded::parse(query_string.as_bytes()).into_owned();
+
+    let mut params: HashMap<String, Vec<String>> = HashMap::new();
+    for (key, value) in query_pairs {
+        let my_key = key.clone(); // TODO There's got to be a better way
+        if !params.contains_key(&key) {
+            params.insert(key, Vec::new());
+        }
+        let values : &mut Vec<String> = params.get_mut(&my_key).unwrap();
+        values.push(value);
+    }
+    println!("Parsed request params: {params:#?}");
+    return params;
+}
+
+#[derive(Debug)]
+struct RowsParams {
+    order_by: MethodsColumns, // TODO this allows a nonexistent column, "Table = methods"
+    order: Order,
+}
+
+fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
+    let mut normal_params : RowsParams = RowsParams {
+        order_by: MethodsColumns::Id,
+        order: Order::Asc,
+    };
+
+    if let Some(v) = params.get("order-by") {
+        if let Some(v) = v.get(0) {
+            match v.as_str() {
+                "id" => { normal_params.order_by = MethodsColumns::Id; },
+                "name" => { normal_params.order_by = MethodsColumns::Name; },
+                "description" => { normal_params.order_by = MethodsColumns::Description; },
+                "image" => { normal_params.order_by = MethodsColumns::Image; },
+                &_ => { },
+            }
+        }
+    }
+
+    if let Some(v) = params.get("desc") {
+        if let Some(v) = v.get(0) {
+            match v.as_str() {
+                "on" | "true" => {
+                    normal_params.order = Order::Desc;
+                },
+                &_ => { },
+            }
+        }
+    }
+
+    return normal_params;
+}
+
+fn handle_rows(req : &Request<Body>) -> Result<Response<Body>, Infallible> {
     let mut response = Response::new(Body::empty());
     
     let pool = mysql::Pool::new("mysql://AzureDiamond:hunter2@localhost/sweng?socket=/run/mysqld/mysqld.sock&prefer_socket=true");
@@ -53,8 +133,28 @@ fn handle_rows(_req : &Request<Body>) -> Result<Response<Body>, Infallible> {
         },
     };
 
+    let params = normalize_rows_params(get_params(&req));
+
+    let query = Query::select()
+        .column(MethodsColumns::Id)
+        .column(MethodsColumns::Name)
+        .column(MethodsColumns::Description)
+        .column(MethodsColumns::Image)
+        .from(MethodsColumns::Table)
+        .order_by(params.order_by, params.order)
+        // .conditions(
+        //     false,
+        //     |q| {
+        //         q.and_where(Expr::col(MethodsColumns::Id).eq(1));
+        //     },
+        //     |_q| {},
+        // )
+        .to_string(MysqlQueryBuilder);
+    
+    // println!("Params dict: {:#?}", params);
+    
     let selected_rows = conn.query_map(
-        "SELECT id, name, description, image FROM methods",
+        query,
         |(id, name, description, image)| {
             MethodEntry {id, name, description, image}
         }
@@ -86,6 +186,7 @@ async fn handle_request(req : Request<Body>) -> Result<Response<Body>, Infallibl
     }
 
 }
+
 
 #[tokio::main]
 async fn main() {

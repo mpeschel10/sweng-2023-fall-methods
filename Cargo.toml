@@ -12,4 +12,6 @@ tokio = { version = "1", features = ["full"] }
 futures = "0.3"
 mysql = "*"
 json = "0.12.4"
+sea-query = "0"
+form_urlencoded = "*"
 
