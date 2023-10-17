@@ -1,6 +1,6 @@
 (() => {
-    const UP = "▲";
-    const DOWN = "▼";
+    const UP = "▲"; // &#9650
+    const DOWN = "▼"; // &#9660
     const COLUMN_NAMES = ["id", "name", "description", "image"];
     
     function hideMethods()
@@ -22,8 +22,7 @@
         
         tbodyMethods.appendChild(rowMethod);
     }
-    // : ; and ▼: &#9660;
-    function getOrderParams() {
+    function getOrder() {
         let activeColumn = "id";
         let activeDirection = UP;
         
@@ -42,11 +41,19 @@
         return new URLSearchParams(order);
     }
 
+    function getWhere() {
+        const where = {};
+        const id = document.getElementById("field-id").value;
+        if (id !== "") { where.where_id = id; }
+        const keyword = document.getElementById("field-keyword").value;
+        if (keyword !== "") { where.where_keyword = `%${keyword}%`; }
+        return where;
+    }
+
     async function refresh()
     {
-        const orderParams = getOrderParams();
-
-        const response = await fetch("/api/rows?" + orderParams);
+        const params = new URLSearchParams({...getOrder(), ...getWhere()})
+        const response = await fetch("/api/rows?" + params);
         const rows = await response.json();
 
         hideMethods();

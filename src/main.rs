@@ -17,7 +17,7 @@ use sea_query::types::Order;
 #[derive(Debug, PartialEq, Eq)]
 struct MethodEntry {
     id: i32,
-    name: i32,
+    name: String,
     description: Option<String>,
     image: Option<String>,
 }
@@ -74,12 +74,21 @@ fn get_params(request : &Request<Body>) -> HashMap<String, Vec<String>> {
 struct RowsParams {
     order_by: MethodsColumns, // TODO this allows a nonexistent column, "Table = methods"
     order: Order,
+    where_id: bool,
+    id: i32,
+    where_keyword: bool,
+    keyword: String,
 }
 
+// TODO this should probably be a ::from interface on RowsParams from HashMap<>
 fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
     let mut normal_params : RowsParams = RowsParams {
         order_by: MethodsColumns::Id,
         order: Order::Asc,
+        where_id: false,
+        id: 1,
+        where_keyword: false,
+        keyword: String::new(),
     };
 
     if let Some(v) = params.get("order_by") {
@@ -102,6 +111,28 @@ fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
                 },
                 &_ => { },
             }
+        }
+    }
+
+    if let Some(v) = params.get("where_id") {
+        if let Some(v) = v.get(0) {
+            match v.parse::<i32>() {
+                Ok(id) => {
+                    normal_params.where_id = true;
+                    normal_params.id = id;
+                },
+                _ => {
+                    normal_params.where_id = true;
+                    normal_params.id = 0; // Never valid for AUTO_INCREMENT table
+                 },
+            }
+        }
+    }
+
+    if let Some(v) = params.get("where_keyword") {
+        if let Some(v) = v.get(0) {
+            normal_params.where_keyword = true;
+            normal_params.keyword = v.clone();
         }
     }
 
@@ -144,16 +175,28 @@ fn handle_rows(req : &Request<Body>) -> Result<Response<Body>, Infallible> {
         .column(MethodsColumns::Image)
         .from(MethodsColumns::Table)
         .order_by(params.order_by, params.order)
-        // .conditions(
-        //     false,
-        //     |q| {
-        //         q.and_where(Expr::col(MethodsColumns::Id).eq(1));
-        //     },
-        //     |_q| {},
-        // )
+        .conditions(
+            params.where_id,
+            |q| {
+                q.and_where(Expr::col(MethodsColumns::Id).eq(params.id));
+            },
+            |_q| {},
+        )
+        .conditions(
+            params.where_keyword,
+            |q| {
+                q.and_where(
+                    Expr::col(MethodsColumns::Name).like(&params.keyword).or(
+                        Expr::col(MethodsColumns::Description).like(&params.keyword)
+                    )
+                );
+            },
+            |_q| {},
+        )
         .to_string(MysqlQueryBuilder);
     
     // println!("Params dict: {:#?}", params);
+    println!("Query: {}", query);
     
     let selected_rows = conn.query_map(
         query,

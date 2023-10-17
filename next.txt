@@ -1,13 +1,9 @@
 Next:
 client:
-    search by keyword or ID backend
-    sort list on front end
-    search by keyword or ID front end
-    # order-by='column', DESC=on, where=''
-        # assert column is correct
     add new item (ID auto generated)
     edit any attribute besides ID
     delete item
+    auto update of search when you type in client
 live update
 add images proper
 
