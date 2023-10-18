@@ -23,6 +23,26 @@
             
         </tbody>
     </table>
+
+    <form id="form-create-row">
+        <label for="field-name">Name: <input name="field-name" type="text" id="field-name"></label>
+        <label for="field-description">Description: <input name="field-description" type="text" id="field-description"></label>
+        <label for="field-image">Image link: <input name="field-image" type="text" id="field-image"></label>
+        <input type="submit" id="button-create-row" value="Create Row">
+    </form>
+
+    <form id="form-edit-row">
+        <label for="field-edit-id">Id: <input name="field-edit-id" type="text" id="field-edit-id"></label>
+        <label for="field-edit-name">Name: <input name="field-edit-name" type="text" id="field-edit-name"></label>
+        <label for="field-edit-description">Description: <input name="field-edit-description" type="text" id="field-edit-description"></label>
+        <label for="field-edit-image">Image link: <input name="field-edit-image" type="text" id="field-edit-image"></label>
+        <input type="submit" id="button-edit-row" value="Edit Row">
+    </form>
+
+    <form id="form-delete-row">
+        <label for="field-delete-id">Id: <input name="field-delete-id" type="text" id="field-delete-id"></label>
+        <input type="submit" id="button-delete-row" value="Delete Row">
+    </form>
 </body>
 <template id="template-method-row">
     <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td></tr>

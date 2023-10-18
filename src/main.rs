@@ -66,7 +66,7 @@ fn get_params(request : &Request<Body>) -> HashMap<String, Vec<String>> {
         let values : &mut Vec<String> = params.get_mut(&my_key).expect("Inserted vector into dictionary and that vector was immediately unreachable. Are we multithreaded now???");
         values.push(value);
     }
-    println!("Parsed request params: {params:#?}");
+    // println!("Parsed request params: {params:#?}");
     return params;
 }
 
@@ -136,9 +136,107 @@ fn normalize_rows_params(params : HashMap<String, Vec<String>>) -> RowsParams {
         }
     }
 
-    println!("Normalized params to {normal_params:#?}");
+    // println!("Normalized params to {normal_params:#?}");
 
     return normal_params;
+}
+
+fn insert(method : MethodEntry) {
+    let pool = mysql::Pool::new("mysql://AzureDiamond:hunter2@localhost/sweng?socket=/run/mysqld/mysqld.sock&prefer_socket=true");
+    let pool = match pool {
+        Ok(pool) => pool,
+        Err(e) => {
+            return;
+        },
+    };
+    
+    let conn = pool.get_conn();
+    let mut conn = match conn {
+        Ok(conn) => conn,
+        Err(e) => {
+            return;
+        },
+    };
+
+    let query = Query::insert()
+        .into_table(MethodsColumns::Table)
+        .columns([MethodsColumns::Name, MethodsColumns::Description, MethodsColumns::Image])
+        .values_panic([method.name.into(), method.description.into(), method.image.into()])
+        .to_string(MysqlQueryBuilder);
+    
+    println!("Running query: {query:#?}");
+    let result = conn.exec_drop(query, ());
+    println!("Insert result: {result:#?}");
+}
+
+fn update(method : MethodEntry) {
+    let pool = mysql::Pool::new("mysql://AzureDiamond:hunter2@localhost/sweng?socket=/run/mysqld/mysqld.sock&prefer_socket=true");
+    let pool = match pool {
+        Ok(pool) => pool,
+        Err(e) => {
+            return;
+        },
+    };
+    
+    let conn = pool.get_conn();
+    let mut conn = match conn {
+        Ok(conn) => conn,
+        Err(e) => {
+            return;
+        },
+    };
+
+    let query = Query::update()
+        .table(MethodsColumns::Table)
+        .values([(MethodsColumns::Name, method.name.into()), (MethodsColumns::Description, method.description.into()), (MethodsColumns::Image, method.image.into())])
+        .and_where(Expr::col(MethodsColumns::Id).eq(method.id))
+        .to_string(MysqlQueryBuilder);
+    
+    println!("Running query: {query:#?}");
+    let result = conn.exec_drop(query, ());
+    println!("Insert result: {result:#?}");
+}
+
+async fn handle_put_row(req : &mut Request<Body>) -> Result<Response<Body>, Infallible> {
+    let arguments = get_params(req);
+    println!("POST /api/row params: {arguments:#?}");
+    let id = arguments.get("field-edit-id").unwrap().get(0).unwrap().parse::<i32>().unwrap();
+    let name = arguments.get("field-edit-name").unwrap().get(0).unwrap().to_string();
+    let description = arguments.get("field-edit-description").unwrap().get(0).unwrap().to_string();
+    let image = arguments.get("field-edit-image").unwrap().get(0).unwrap().to_string();
+    
+    let method = MethodEntry { id: id, name: name, description: Some(description), image: Some(image)};
+    
+    update(method);
+    
+    Ok(Response::new("Howdy!".into()))
+}
+
+fn delete(id : i32) {
+    let pool = mysql::Pool::new("mysql://AzureDiamond:hunter2@localhost/sweng?socket=/run/mysqld/mysqld.sock&prefer_socket=true");
+    let pool = match pool {
+        Ok(pool) => pool,
+        Err(_e) => {
+            return;
+        },
+    };
+    
+    let conn = pool.get_conn();
+    let mut conn = match conn {
+        Ok(conn) => conn,
+        Err(_e) => {
+            return;
+        },
+    };
+
+    let query = Query::delete()
+        .from_table(MethodsColumns::Table)
+        .cond_where(Expr::col(MethodsColumns::Id).eq(id))
+        .to_string(MysqlQueryBuilder);
+    
+    println!("Running query: {query:#?}");
+    let result = conn.exec_drop(query, ());
+    println!("Insert result: {result:#?}");
 }
 
 fn handle_rows(req : &Request<Body>) -> Result<Response<Body>, Infallible> {
@@ -216,11 +314,70 @@ fn handle_rows(req : &Request<Body>) -> Result<Response<Body>, Infallible> {
     return Ok(response);
 }
 
-async fn handle_request(req : Request<Body>) -> Result<Response<Body>, Infallible> {
+async fn handle_post_row(req : &mut Request<Body>) -> Result<Response<Body>, Infallible> {
+    let arguments = get_params(req);
+    println!("POST /api/row params: {arguments:#?}");
+    let name = arguments.get("field-name").unwrap().get(0).unwrap().to_string();
+    let description = arguments.get("field-description").unwrap().get(0).unwrap().to_string();
+    let image = arguments.get("field-image").unwrap().get(0).unwrap().to_string();
+    
+    let method = MethodEntry { id: 0, name: name, description: Some(description), image: Some(image)};
+    
+    insert(method);
+    
+    Ok(Response::new("Howdy!".into()))
+}
+
+async fn handle_delete_row(req : &mut Request<Body>) -> Result<Response<Body>, Infallible> {
+    let arguments = get_params(req);
+    println!("DELETE /api/row params: {arguments:#?}");
+    let id = arguments.get("field-delete-id").unwrap().get(0).unwrap().parse::<i32>().unwrap();
+    delete(id);
+    
+    Ok(Response::new("Howdy!".into()))
+}
+
+// Got request to handle_post_row Request {
+//     method: POST,
+//     uri: /api/row,
+//     version: HTTP/1.0,
+//     headers: {
+//         "host": "127.0.0.1:12181",
+//         "connection": "close",
+//         "content-length": "419",
+//         "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/118.0",
+//         "accept": "*/*",
+//         "accept-language": "en-US,en;q=0.5",
+//         "accept-encoding": "gzip, deflate, br",
+//         "referer": "http://localhost/?",
+//         "content-type": "multipart/form-data; boundary=---------------------------131870820826134894091747844280",
+//         "origin": "http://localhost",
+//         "cookie": "G_ENABLED_IDPS=google",
+//         "sec-fetch-dest": "empty",
+//         "sec-fetch-mode": "cors",
+//         "sec-fetch-site": "same-origin",
+//         "pragma": "no-cache",
+//         "cache-control": "no-cache",
+//     },
+//     body: Body(
+//         Streaming,
+//     ),
+// }
+
+async fn handle_request(mut req : Request<Body>) -> Result<Response<Body>, Infallible> {
     
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/api/rows") => {
             return handle_rows(&req);
+        },
+        (&Method::POST, "/api/row") => {
+            return handle_post_row(&mut req).await;
+        },
+        (&Method::DELETE, "/api/row") => {
+            return handle_delete_row(&mut req).await;
+        },
+        (&Method::PUT, "/api/row") => {
+            return handle_put_row(&mut req).await;
         },
         _ => {
             let mut response = Response::new(Body::empty());

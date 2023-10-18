@@ -18,7 +18,10 @@
         rowMethod.querySelector(".column-id").textContent = method.id;
         rowMethod.querySelector(".column-name").textContent = method.name;
         rowMethod.querySelector(".column-description").textContent = method.description;
-        rowMethod.querySelector(".column-image").textContent = method.image;
+
+        const image = document.createElement("img");
+        image.src = method.image;
+        rowMethod.querySelector(".column-image").appendChild(image);
         
         tbodyMethods.appendChild(rowMethod);
     }
@@ -38,7 +41,7 @@
         let order = { order_by: activeColumn, };
         if (activeDirection === DOWN) order.desc = 'on';
         
-        return new URLSearchParams(order);
+        return order;
     }
 
     function getWhere() {
@@ -53,7 +56,9 @@
     async function refresh()
     {
         const params = new URLSearchParams({...getOrder(), ...getWhere()})
-        const response = await fetch("/api/rows?" + params);
+        const url = "/api/rows?" + params;
+        console.log("URL: " + url);
+        const response = await fetch(url);
         const rows = await response.json();
 
         hideMethods();
@@ -78,6 +83,46 @@
         refresh();
     }
 
+    function onButtonEditRow(event) {
+        console.log("Editing");
+        event.preventDefault();
+        const form = document.getElementById("form-edit-row");
+        const formData = new URLSearchParams(new FormData(form));
+        const url = "/api/row?" + formData;
+        console.log("PUT " + url);
+        fetch(url, {
+            method: "PUT",
+        });
+        refresh();
+    }
+
+    function onButtonDeleteRow(event) {
+        event.preventDefault();
+        const form = document.getElementById("form-delete-row");
+        const formData = new URLSearchParams(new FormData(form));
+        const url = "/api/row?" + formData;
+        console.log("Posting " + url);
+        fetch(url, {
+            method: "DELETE",
+        });
+        refresh();
+    }
+
+    function onButtonCreateRow(event) {
+        event.preventDefault();
+        const form = document.getElementById("form-create-row");
+        const formData = new URLSearchParams(new FormData(form));
+        // for (const entry of formData.entries()) {
+        //     console.log(entry);
+        // }
+        const url = "/api/row?" + formData;
+        console.log("Posting " + url);
+        fetch(url, {
+            method: "POST",
+            // body: formData,
+        });
+    }
+
     function init() {
         for (const columnName of COLUMN_NAMES) {
             const span = document.getElementById(`span-${columnName}-header`);
@@ -87,6 +132,13 @@
 
             button.addEventListener('click', onButtonColumn);
         }
+
+        const buttonCreateRow = document.getElementById("button-create-row");
+        buttonCreateRow.addEventListener("click", onButtonCreateRow);
+        const buttonDeleteRow = document.getElementById("button-delete-row");
+        buttonDeleteRow.addEventListener("click", onButtonDeleteRow);
+        const buttonEditRow = document.getElementById("button-edit-row");
+        buttonEditRow.addEventListener("click", onButtonEditRow);
         refresh();
     }
 
