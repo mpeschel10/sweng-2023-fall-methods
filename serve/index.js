@@ -144,6 +144,7 @@
             method: "POST",
             // body: formData,
         });
+        refresh();
     }
 
     function init() {
