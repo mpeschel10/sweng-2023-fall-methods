@@ -18,7 +18,7 @@ VALUES
     ("418", "I'm a teapot", "/images/418.webp"),
     ("413", "Payload Too Large", "/images/413.jpg.webp"),
     ("405", "Method Not Allowed", "/images/405.png"),
-    ("404", "Not found", "/images/404.gif"),
+    ("404", "Not found", "/images/404.jpg"), -- Actually "/images/404.gif"
     ("403", "Forbidden", "/images/403.png"),
     ("501", "Method Not Known", "/images/501.jpg"),
     ("500", "Internal Server Error", "/images/500.gif")
