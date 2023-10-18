@@ -1,5 +1,5 @@
 # sweng-2023-fall-methods
-Homework project for CMPSC 487W project 2: a database and client for html response codes.
+Homework project for CMPSC 487W project 2: a database and client for HTTP response codes.
 
 Image uploading is not supported.
 
