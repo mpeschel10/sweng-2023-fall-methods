@@ -95,14 +95,14 @@
         refresh();
     }
 
-    function onButtonEditRow(event) {
+    async function onButtonEditRow(event) {
         console.log("Editing");
         event.preventDefault();
         const form = document.getElementById("form-edit-row");
         const formData = new URLSearchParams(new FormData(form));
         const url = "/api/row?" + formData;
         console.log("PUT " + url);
-        fetch(url, {
+        await fetch(url, {
             method: "PUT",
         });
         refresh();
@@ -119,19 +119,19 @@
         document.getElementById("non-edit-stuff").style.display = "none";
     }
 
-    function onButtonDelete(event) {
+    async function onButtonDelete(event) {
         const id = event.target.methodId;
         const formData = new URLSearchParams({"field-delete-id": id});
         const url = "/api/row?" + formData;
         console.log("DELETE THIS " + url);
-        fetch(url, {
+        await fetch(url, {
             method: "DELETE",
         });
         refresh();
 
     }
 
-    function onButtonCreateRow(event) {
+    async function onButtonCreateRow(event) {
         event.preventDefault();
         const form = document.getElementById("form-create-row");
         const formData = new URLSearchParams(new FormData(form));
@@ -140,7 +140,7 @@
         // }
         const url = "/api/row?" + formData;
         console.log("Posting " + url);
-        fetch(url, {
+        await fetch(url, {
             method: "POST",
             // body: formData,
         });
