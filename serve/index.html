@@ -8,9 +8,19 @@
     <link href="index.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <label for="field-id">Search by id: <input type="text" id="field-id"></label>
+    <div id="non-edit-stuff">
+        <fieldset><legend>Add a method!</legend>
+    <form id="form-create-row">
+        <label for="field-name">Name: <input name="field-name" type="text" id="field-name"></label>
+        <label for="field-description">Description: <input name="field-description" type="text" id="field-description"></label>
+        <label for="field-image">Image link: <input name="field-image" type="text" id="field-image"></label>
+        <input type="submit" id="button-create-row" value="Create Row">
+    </form>
+</fieldset>
+<label for="field-id">Search by id: <input type="text" id="field-id"></label>
     <label for="field-keyword">Search by keyword: <input type="text" id="field-keyword"></label>
-    <table>
+    
+    <table id="table">
         <thead>
             <tr>
                 <th><button id="button-id-header">ID <span id="span-id-header">&#9650</span></button></th>
@@ -25,12 +35,7 @@
         </tbody>
     </table>
 
-    <form id="form-create-row">
-        <label for="field-name">Name: <input name="field-name" type="text" id="field-name"></label>
-        <label for="field-description">Description: <input name="field-description" type="text" id="field-description"></label>
-        <label for="field-image">Image link: <input name="field-image" type="text" id="field-image"></label>
-        <input type="submit" id="button-create-row" value="Create Row">
-    </form>
+    </div>
 
     <form id="form-edit-row">
         <label for="field-edit-id">Id: <input name="field-edit-id" type="text" id="field-edit-id"></label>
@@ -42,6 +47,6 @@
 
 </body>
 <template id="template-method-row">
-    <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td><td><button class="button-delete">X</button></td></tr>
+    <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td><td><button class="button-delete">X</button></td><td><button class="button-edit">Edit</button></td></tr>
 </template>
 </html>

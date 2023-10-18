@@ -31,6 +31,10 @@
         buttonDelete.methodId = method.id;
         buttonDelete.addEventListener("click", onButtonDelete);
         
+        const buttonEdit = rowMethod.querySelector(".button-edit");
+        buttonEdit.methodId = method.id;
+        buttonEdit.addEventListener("click", onButtonEdit);
+        
         tbodyMethods.appendChild(rowMethod);
     }
     function getOrder() {
@@ -102,18 +106,17 @@
             method: "PUT",
         });
         refresh();
+        document.getElementById("non-edit-stuff").style.display = "block";
+        document.getElementById("form-edit-row").style.display = "none";
     }
 
-    function onButtonDeleteRow(event) {
-        event.preventDefault();
-        const form = document.getElementById("form-delete-row");
-        const formData = new URLSearchParams(new FormData(form));
-        const url = "/api/row?" + formData;
-        console.log("DELETE THIS " + url);
-        fetch(url, {
-            method: "DELETE",
-        });
-        refresh();
+    function onButtonEdit(event) {
+        document.getElementById("field-edit-id").value = event.target.parentElement.parentElement.querySelector(".column-id").textContent;
+        document.getElementById("field-edit-name").value = event.target.parentElement.parentElement.querySelector(".column-name").textContent;
+        document.getElementById("field-edit-description").value = event.target.parentElement.parentElement.querySelector(".column-description").textContent;
+        document.getElementById("field-edit-image").value = event.target.parentElement.parentElement.querySelector(".column-image").querySelector("img").src;
+        document.getElementById("form-edit-row").style.display = "block";
+        document.getElementById("non-edit-stuff").style.display = "none";
     }
 
     function onButtonDelete(event) {
