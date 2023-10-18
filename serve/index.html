@@ -17,6 +17,7 @@
                 <th><button id="button-name-header">Name <span id="span-name-header"></span></button></th>
                 <th><button id="button-description-header">Description <span id="span-description-header"></span></button></th>
                 <th><button id="button-image-header">Image <span id="span-image-header"></span></button></th>
+                <th>Delete</th>
             </tr>
         </thead>
         <tbody id="tbody-methods">
@@ -39,12 +40,8 @@
         <input type="submit" id="button-edit-row" value="Edit Row">
     </form>
 
-    <form id="form-delete-row">
-        <label for="field-delete-id">Id: <input name="field-delete-id" type="text" id="field-delete-id"></label>
-        <input type="submit" id="button-delete-row" value="Delete Row">
-    </form>
 </body>
 <template id="template-method-row">
-    <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td></tr>
+    <tr id="secret-sauce"><td class="column-id"></td><td class="column-name"></td><td class="column-description"></td><td class="column-image"></td><td><button class="button-delete">X</button></td></tr>
 </template>
 </html>

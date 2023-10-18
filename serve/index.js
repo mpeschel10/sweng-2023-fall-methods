@@ -9,6 +9,10 @@
         tbodyMethods.replaceChildren();
     }
 
+    function onFieldKeyup() {
+        refresh();
+    }
+
     function showMethod(method)
     {
         const tbodyMethods = document.getElementById("tbody-methods");
@@ -22,6 +26,10 @@
         const image = document.createElement("img");
         image.src = method.image;
         rowMethod.querySelector(".column-image").appendChild(image);
+        
+        const buttonDelete = rowMethod.querySelector(".button-delete");
+        buttonDelete.methodId = method.id;
+        buttonDelete.addEventListener("click", onButtonDelete);
         
         tbodyMethods.appendChild(rowMethod);
     }
@@ -101,11 +109,23 @@
         const form = document.getElementById("form-delete-row");
         const formData = new URLSearchParams(new FormData(form));
         const url = "/api/row?" + formData;
-        console.log("Posting " + url);
+        console.log("DELETE THIS " + url);
         fetch(url, {
             method: "DELETE",
         });
         refresh();
+    }
+
+    function onButtonDelete(event) {
+        const id = event.target.methodId;
+        const formData = new URLSearchParams({"field-delete-id": id});
+        const url = "/api/row?" + formData;
+        console.log("DELETE THIS " + url);
+        fetch(url, {
+            method: "DELETE",
+        });
+        refresh();
+
     }
 
     function onButtonCreateRow(event) {
@@ -135,10 +155,13 @@
 
         const buttonCreateRow = document.getElementById("button-create-row");
         buttonCreateRow.addEventListener("click", onButtonCreateRow);
-        const buttonDeleteRow = document.getElementById("button-delete-row");
-        buttonDeleteRow.addEventListener("click", onButtonDeleteRow);
         const buttonEditRow = document.getElementById("button-edit-row");
         buttonEditRow.addEventListener("click", onButtonEditRow);
+        const fieldId = document.getElementById("field-id");
+        fieldId.addEventListener("keyup", onFieldKeyup);
+        const fieldKeyword = document.getElementById("field-keyword");
+        fieldKeyword.addEventListener("keyup", onFieldKeyup);
+        
         refresh();
     }
 

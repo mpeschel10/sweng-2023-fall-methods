@@ -1,5 +1,7 @@
 Next:
-add images proper
+upload
+script video
+perform
 
 startup script?
 sudo systemctl start mariadb
